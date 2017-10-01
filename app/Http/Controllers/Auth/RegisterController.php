@@ -51,9 +51,10 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => 'string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'email' => 'required|email',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'user.password' => 'required|string|min:6'
         ]);
     }
 
@@ -66,7 +67,7 @@ class RegisterController extends Controller
     {
         $v = $this->validator($request->all());
 
-        if ($validator->fails()) {
+        if ($v->fails()) {
             return response()->json(['error'=>$validator->errors()], 401);            
         }
 	//massage the data
@@ -75,10 +76,11 @@ class RegisterController extends Controller
 	//create user
         $user = User::create($input);
 	//build success response
-        $success['token'] =  $user->createToken('FromRegister')->accessToken;
-        $success['name'] =  $user->name;
+        $auth =  $user->createToken('FromRegister')->accessToken;
+        $success['name'] =  $user_data =  collect($user->attributesToArray())
+            ->only(['first_name', 'last_name', 'email', 'id']);
 
-        return response()->json(['success'=>$success], $this->successStatus);
+        return response()->json(array('auth' => $auth, 'user' => $user_data), 201);
     }
 
     /**

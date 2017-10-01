@@ -18,7 +18,9 @@ Route::get('login', [
   'uses' => 'Auth\LoginController@showLoginForm'
 ]);
 */
-
+Route::post('hello', function($req){
+    return response(json_encode(['Yo', $req]));
+});
 
 Route::post('login', [
   'as' => '',
