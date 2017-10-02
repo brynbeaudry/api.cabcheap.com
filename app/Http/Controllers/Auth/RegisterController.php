@@ -81,7 +81,7 @@ class RegisterController extends Controller
         //dd('input', $input);
 	//create user
         $user = User::create($input);
-        User::destroy($user->id);
+        //User::destroy($user->id);
 
 	//build success response
         //dd($user->createToken('FromRegister'));
