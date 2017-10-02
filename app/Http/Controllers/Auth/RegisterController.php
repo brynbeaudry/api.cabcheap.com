@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\User;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
+use Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+
 
 class RegisterController extends Controller
 {
@@ -54,7 +56,7 @@ class RegisterController extends Controller
             'email' => 'required|email',
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'user.password' => 'required|string|min:6'
+            'password' => 'required|string|min:6'
         ]);
     }
 
@@ -65,22 +67,34 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
-        $v = $this->validator($request->all());
+        //dd($request->user);
+        $v = $this->validator($request->user);
+
 
         if ($v->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);            
+            return response()->json(['error'=>$v->errors()], 401);
         }
 	//massage the data
-        $input = $request->all();
+        $input = $request->user;
+        //dd('input', $input);
         $input['password'] = bcrypt($input['password']);
+        //dd('input', $input);
 	//create user
         $user = User::create($input);
-	//build success response
-        $auth =  $user->createToken('FromRegister')->accessToken;
-        $success['name'] =  $user_data =  collect($user->attributesToArray())
-            ->only(['first_name', 'last_name', 'email', 'id']);
+        User::destroy($user->id);
 
-        return response()->json(array('auth' => $auth, 'user' => $user_data), 201);
+	//build success response
+        //dd($user->createToken('FromRegister'));
+        $token = $user->createToken('FromRegister');
+        $access_token =  $token->accessToken;
+        //->attributes->expires_at
+        $token = collect($token->token);
+        $expires_at = $token->get('expires_at');
+        //dd($access_token, $token->get('expires_at'));
+        //dd($token
+        $user_data =  $user->only(['first_name', 'last_name', 'email', 'id']);
+
+        return response()->json(array('auth' => array('access_token' => $access_token, 'expires_at' => $expires_at), 'user' => $user_data), 201);
     }
 
     /**

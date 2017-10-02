@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,8 +18,9 @@ Route::get('login', [
   'uses' => 'Auth\LoginController@showLoginForm'
 ]);
 */
-Route::post('hello', function($req){
-    return response(json_encode(['Yo', $req]));
+Route::post('hello', function(Request $request){
+
+    return response()->json($request->all());
 });
 
 Route::post('login', [

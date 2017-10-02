@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use Validator;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
